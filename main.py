@@ -1,4 +1,4 @@
-#% matplotlib tk
+# % matplotlib tk
 import urllib.request
 import json
 import matplotlib.pyplot as plt
@@ -25,13 +25,15 @@ track, = ax.plot([], [], 'ro')
 
 opener = urllib.request.build_opener()
 opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+annotation_list = []
 
 
 # UPDATE FUNCTION
 def update(self):
     # SEND QUERY
     fp = opener.open(
-        'http://public-api.adsbexchange.com/VirtualRadar/AircraftList.json?lat=40.639722&lng=-73.778889&fDstL=0&fDstU=20')
+        'http://public-api.adsbexchange.com/VirtualRadar/'
+        'AircraftList.json?lat=40.639722&lng=-73.778889&fDstL=0&fDstU=20')
     mybyte = fp.read()
     mystr = mybyte.decode("utf8")
     js_str = json.loads(mystr)
@@ -40,7 +42,7 @@ def update(self):
     long_list = []
     op_list = []  # OPERATOR LIST
 
-    for num, flight_data in enumerate(js_str['acList']):
+    for num, flight_data in enumerate(js_str['acList']):  # num index, flight_data dict
         lat = flight_data['Lat']
         lon = flight_data['Long']
         lat_list.append(lat)
@@ -52,17 +54,19 @@ def update(self):
     # LABELING
 
     # REMOVE LABEL
-    for num, annot in enumerate(anotation_list):
-        annot.remove()
-    anotation_list[:] = []
+    for num, annot in enumerate(annotation_list):
+        annot.remove()  # this should remove old labels, but it is not doing it
+        print(1)  # nothing is being removed!
+    annotation_list[:] = []
+    print(2)
 
     # CREATE LABEL CONTAINER
     for num, annot in enumerate(js_str['acList']):
         annotation = ax.annotate('text', xy=(0, 0), size='smaller')
-        anotation_list.append(annotation)
+        annotation_list.append(annotation)
 
     # UPDATE LABEL POSITION AND OPERATOR
-    for num, ano in enumerate(anotation_list):
+    for num, ano in enumerate(annotation_list):
         ano.set_position((long_list[num], lat_list[num]))
         ano.xy = (long_list[num], lat_list[num])
         txt_op = str(op_list[num])
